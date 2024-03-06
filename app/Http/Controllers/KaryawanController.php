@@ -7,14 +7,16 @@ use Illuminate\Support\Facades\Validator;
 
 class KaryawanController extends Controller
 {
+    // Method untuk menampilkan halaman input
     public function index()
     {
         return view('input-karyawan');
     }
 
+    // Method untuk menerima data karyawan dan memberikan keputusan penerimaan
     public function terimaKaryawan(Request $request)
     {
-        // Validasi input
+        // Validasi input menggunakan Validator
         $validator = Validator::make($request->all(), [
             'nilai_wawancara' => 'required|numeric|min:0|max:100',
             'nilai_kemampuan' => 'required|numeric|min:0|max:100',
@@ -50,15 +52,15 @@ class KaryawanController extends Controller
         return response()->json($hasilKeputusan);
     }
 
-
+    // Method untuk menerapkan logika fuzzy metode Sugeno
     private function logikaFuzzySugeno($nilaiWawancara, $nilaiKemampuan, $nilaiSoftSkill, $nilaiPsikologi, $nilaiKeterampilanBahasa)
     {
         // Koefisien relatif dari masing-masing variabel input
-        $koefisienWawancara = 0.3;
-        $koefisienKemampuan = 0.3;
-        $koefisienSoftSkill = 0.2;
-        $koefisienPsikologi = 0.1;
-        $koefisienKeterampilanBahasa = 0.1;
+        $koefisienWawancara = 30;
+        $koefisienKemampuan = 30;
+        $koefisienSoftSkill = 20;
+        $koefisienPsikologi = 10;
+        $koefisienKeterampilanBahasa = 10;
 
         // Menghitung nilai bobot dari masing-masing input
         $totalBobot = $koefisienWawancara + $koefisienKemampuan + $koefisienSoftSkill + $koefisienPsikologi + $koefisienKeterampilanBahasa;
@@ -77,7 +79,7 @@ class KaryawanController extends Controller
         return $skorKeputusan;
     }
 
-
+    // Method untuk menentukan label keputusan berdasarkan skor
     private function tentukanKeputusan($skorKeputusan)
     {
         // Menentukan keputusan berdasarkan skor
