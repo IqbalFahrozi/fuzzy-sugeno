@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class KaryawanController extends Controller
 {
@@ -13,6 +14,20 @@ class KaryawanController extends Controller
 
     public function terimaKaryawan(Request $request)
     {
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'nilai_wawancara' => 'required|numeric|min:0|max:100',
+            'nilai_kemampuan' => 'required|numeric|min:0|max:100',
+            'nilai_soft_skill' => 'required|numeric|min:0|max:100',
+            'nilai_psikologi' => 'required|numeric|min:0|max:100',
+            'nilai_keterampilan_bahasa' => 'required|numeric|min:0|max:100',
+        ]);
+
+        // Jika validasi gagal, kembalikan pesan kesalahan
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         // Mendapatkan nilai input dari request
         $nilaiWawancara = $request->input('nilai_wawancara');
         $nilaiKemampuan = $request->input('nilai_kemampuan');
@@ -21,38 +36,47 @@ class KaryawanController extends Controller
         $nilaiKeterampilanBahasa = $request->input('nilai_keterampilan_bahasa');
 
         // Menerapkan logika fuzzy metode Sugeno
-        $keputusanPenerimaan = $this->logikaFuzzySugeno($nilaiWawancara, $nilaiKemampuan, $nilaiSoftSkill, $nilaiPsikologi, $nilaiKeterampilanBahasa);
+        $skorKeputusan = $this->logikaFuzzySugeno($nilaiWawancara, $nilaiKemampuan, $nilaiSoftSkill, $nilaiPsikologi, $nilaiKeterampilanBahasa);
 
-        // Mengembalikan hasil keputusan
-        return response()->json(['keputusan' => $keputusanPenerimaan]);
+        // Tentukan label keputusan berdasarkan skor
+        $labelKeputusan = $this->tentukanKeputusan($skorKeputusan);
+
+        // Format hasil keputusan
+        $hasilKeputusan = [
+            'keputusan' => $labelKeputusan . ' dengan skor ' . $skorKeputusan
+        ];
+
+        // Mengembalikan hasil keputusan dalam format JSON
+        return response()->json($hasilKeputusan);
     }
+
 
     private function logikaFuzzySugeno($nilaiWawancara, $nilaiKemampuan, $nilaiSoftSkill, $nilaiPsikologi, $nilaiKeterampilanBahasa)
     {
-        // Total bobot
-        $totalBobot = 100;
+        // Koefisien relatif dari masing-masing variabel input
+        $koefisienWawancara = 0.3;
+        $koefisienKemampuan = 0.3;
+        $koefisienSoftSkill = 0.2;
+        $koefisienPsikologi = 0.1;
+        $koefisienKeterampilanBahasa = 0.1;
 
-        // Menyesuaikan nilai koefisien agar total menjadi 100
-        $totalKoefisien = 0.3 + 0.3 + 0.2 + 0.1 + 0.1;
-        $koefisienWawancara = (0.3 / $totalKoefisien) * $totalBobot;
-        $koefisienKemampuan = (0.3 / $totalKoefisien) * $totalBobot;
-        $koefisienSoftSkill = (0.2 / $totalKoefisien) * $totalBobot;
-        $koefisienPsikologi = (0.1 / $totalKoefisien) * $totalBobot;
-        $koefisienKeterampilanBahasa = (0.1 / $totalKoefisien) * $totalBobot;
+        // Menghitung nilai bobot dari masing-masing input
+        $totalBobot = $koefisienWawancara + $koefisienKemampuan + $koefisienSoftSkill + $koefisienPsikologi + $koefisienKeterampilanBahasa;
 
-        // Menerapkan aturan fuzzy
+        // Menghitung skor keputusan menggunakan metode Sugeno
         $skorKeputusan = ($koefisienWawancara * $nilaiWawancara +
                           $koefisienKemampuan * $nilaiKemampuan +
                           $koefisienSoftSkill * $nilaiSoftSkill +
                           $koefisienPsikologi * $nilaiPsikologi +
                           $koefisienKeterampilanBahasa * $nilaiKeterampilanBahasa) / $totalBobot;
 
-        // Menentukan keputusan penerimaan berdasarkan skor
-        $keputusan = $this->tentukanKeputusan($skorKeputusan);
+        // Membulatkan nilai skor keputusan menjadi 2 angka di belakang koma
+        $skorKeputusan = round($skorKeputusan, 2);
 
-        // Mengembalikan keputusan
-        return $keputusan;
+        // Mengembalikan skor keputusan
+        return $skorKeputusan;
     }
+
 
     private function tentukanKeputusan($skorKeputusan)
     {
@@ -70,4 +94,3 @@ class KaryawanController extends Controller
         }
     }
 }
-
