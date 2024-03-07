@@ -1,15 +1,5 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Nilai Tes Karyawan</title>
+<x-app-layout>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
         form {
             max-width: 400px;
             margin: 0 auto;
@@ -39,8 +29,7 @@
             background-color: #0056b3;
         }
     </style>
-</head>
-<body>
+
     <h2>Input Nilai Tes Karyawan</h2>
     <form method="POST" action="{{ route('terima-karyawan') }}">
         @csrf
@@ -81,5 +70,4 @@
             }
         });
     </script>
-</body>
-</html>
+</x-app-layout>

@@ -11,7 +11,7 @@
             </li>
 
             <li>
-                <a href="#">
+                <a href="{{ route('dashboard.index') }}" {{ request()->routeIs('dashboard.index') ? 'active' : '' }}>
                     <span class="icon">
                         <ion-icon name="home-outline"></ion-icon>
                     </span>
@@ -20,7 +20,7 @@
             </li>
 
             <li>
-                <a href="#">
+                <a href="{{ route('karyawan.index') }}" {{ request()->routeIs('karyawan.index') ? 'active' : '' }}>
                     <span class="icon">
                         <ion-icon name="people-outline"></ion-icon>
                     </span>
@@ -75,4 +75,7 @@
         </ul>
     </div>
 
+
 <!-- Sidebar End -->
+
+
