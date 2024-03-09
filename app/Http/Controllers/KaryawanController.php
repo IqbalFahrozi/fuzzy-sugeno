@@ -4,19 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Karyawan;
 
 class KaryawanController extends Controller
 {
-    // Method untuk menampilkan halaman input
     public function index()
     {
-        return view('input-karyawan');
+        $karyawanData = Karyawan::join('nilai_karyawan', 'karyawan.id', '=', 'nilai_karyawan.karyawan_id')->get();
+        $skorTertinggi = Karyawan::max('skor_keputusan');
+
+        return view('input-karyawan', compact('karyawanData', 'skorTertinggi'));
     }
 
-    // Method untuk menerima data karyawan dan memberikan keputusan penerimaan
     public function terimaKaryawan(Request $request)
     {
-        // Validasi input menggunakan Validator
         $validator = Validator::make($request->all(), [
             'nilai_wawancara' => 'required|numeric|min:0|max:100',
             'nilai_kemampuan' => 'required|numeric|min:0|max:100',
@@ -25,64 +26,50 @@ class KaryawanController extends Controller
             'nilai_keterampilan_bahasa' => 'required|numeric|min:0|max:100',
         ]);
 
-        // Jika validasi gagal, kembalikan pesan kesalahan
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Mendapatkan nilai input dari request
         $nilaiWawancara = $request->input('nilai_wawancara');
         $nilaiKemampuan = $request->input('nilai_kemampuan');
         $nilaiSoftSkill = $request->input('nilai_soft_skill');
         $nilaiPsikologi = $request->input('nilai_psikologi');
         $nilaiKeterampilanBahasa = $request->input('nilai_keterampilan_bahasa');
 
-        // Menerapkan logika fuzzy metode Sugeno
         $skorKeputusan = $this->logikaFuzzySugeno($nilaiWawancara, $nilaiKemampuan, $nilaiSoftSkill, $nilaiPsikologi, $nilaiKeterampilanBahasa);
 
-        // Tentukan label keputusan berdasarkan skor
         $labelKeputusan = $this->tentukanKeputusan($skorKeputusan);
 
-        // Format hasil keputusan
         $hasilKeputusan = [
             'keputusan' => $labelKeputusan . ' dengan skor ' . $skorKeputusan
         ];
 
-        // Mengembalikan hasil keputusan dalam format JSON
         return response()->json($hasilKeputusan);
     }
 
-    // Method untuk menerapkan logika fuzzy metode Sugeno
     private function logikaFuzzySugeno($nilaiWawancara, $nilaiKemampuan, $nilaiSoftSkill, $nilaiPsikologi, $nilaiKeterampilanBahasa)
     {
-        // Koefisien relatif dari masing-masing variabel input
         $koefisienWawancara = 30;
         $koefisienKemampuan = 30;
         $koefisienSoftSkill = 20;
         $koefisienPsikologi = 10;
         $koefisienKeterampilanBahasa = 10;
 
-        // Menghitung nilai bobot dari masing-masing input
         $totalBobot = $koefisienWawancara + $koefisienKemampuan + $koefisienSoftSkill + $koefisienPsikologi + $koefisienKeterampilanBahasa;
 
-        // Menghitung skor keputusan menggunakan metode Sugeno
         $skorKeputusan = ($koefisienWawancara * $nilaiWawancara +
                           $koefisienKemampuan * $nilaiKemampuan +
                           $koefisienSoftSkill * $nilaiSoftSkill +
                           $koefisienPsikologi * $nilaiPsikologi +
                           $koefisienKeterampilanBahasa * $nilaiKeterampilanBahasa) / $totalBobot;
 
-        // Membulatkan nilai skor keputusan menjadi 2 angka di belakang koma
         $skorKeputusan = round($skorKeputusan, 2);
 
-        // Mengembalikan skor keputusan
         return $skorKeputusan;
     }
 
-    // Method untuk menentukan label keputusan berdasarkan skor
     private function tentukanKeputusan($skorKeputusan)
     {
-        // Menentukan keputusan berdasarkan skor
         if ($skorKeputusan < 40) {
             return 'Tidak Layak';
         } elseif ($skorKeputusan < 70) {

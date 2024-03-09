@@ -265,7 +265,7 @@ body {
   width: 100%;
   padding: 20px;
   display: grid;
-  grid-template-columns: 4fr 1fr;
+  /* grid-template-columns: 4fr 1fr; */
   grid-gap: 30px;
   /* margin-top: 10px; */
 }
@@ -280,11 +280,12 @@ body {
   border-radius: 20px;
 }
 
-.details .cardHeader {
+/* .details .cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-}
+} */
+
 .cardHeader h2 {
   font-weight: 600;
   color: var(--blue);
@@ -314,8 +315,8 @@ body {
   border-bottom: none;
 }
 .details .recentOrders table tbody tr:hover {
-  background: var(--blue);
-  color: var(--white);
+  background-color: var(--blue);
+  color: var(--black2);
 }
 .details .recentOrders table tr td {
   padding: 10px;
