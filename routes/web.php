@@ -33,6 +33,6 @@ Route::middleware('auth')->group(function () {
 Route::get('/karyawan', [KaryawanController::class, 'index'])->name('karyawan.index');
 Route::post('/terima-karyawan', [KaryawanController::class, 'terimaKaryawan'])->name('terima-karyawan');
 
-Route::get('/home', [DashboardController::class, 'index'])->name('dashboard.index');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
 require __DIR__.'/auth.php';

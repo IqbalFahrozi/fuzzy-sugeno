@@ -9,7 +9,7 @@ class NilaiKaryawan extends Model
 {
     use HasFactory;
 
-    protected $table = 'nilai_karyawan';
+    protected $table = 'nilai_karyawan'; // Menentukan nama tabel yang harus digunakan
 
     protected $fillable = [
         'karyawan_id',
@@ -23,6 +23,6 @@ class NilaiKaryawan extends Model
     // Definisikan relasi dengan karyawan
     public function karyawan()
     {
-        return $this->belongsTo(Karyawan::class);
+        return $this->belongsTo(Karyawan::class, 'karyawan_id');
     }
 }

@@ -13,13 +13,15 @@ class Karyawan extends Model
 
     protected $fillable = [
         'nama',
-        'posisi_diterima',
+        'status',
         'skor_keputusan',
     ];
 
     // Definisikan relasi dengan nilai karyawan
     public function nilaiKaryawan()
     {
-        return $this->hasMany(NilaiKaryawan::class);
+        return $this->hasMany(NilaiKaryawan::class, 'karyawan_id');
     }
 }
+
+

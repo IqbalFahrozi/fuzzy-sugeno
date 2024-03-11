@@ -13,8 +13,8 @@ class KaryawanSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        // Looping untuk membuat 30 data fake karyawan
-        for ($i = 0; $i < 100; $i++) {
+        // Looping untuk membuat 50 data fake karyawan
+        for ($i = 0; $i < 50; $i++) {
             $namaKaryawan = $faker->name;
             $nilaiWawancara = rand(0, 100); // Contoh nilai wawancara acak
             $nilaiKemampuan = rand(0, 100); // Contoh nilai kemampuan acak
@@ -23,8 +23,8 @@ class KaryawanSeeder extends Seeder
             $nilaiKeterampilanBahasa = rand(0, 100); // Contoh nilai keterampilan bahasa acak
             $skorKeputusan = $this->logikaFuzzySugeno($nilaiWawancara, $nilaiKemampuan, $nilaiSoftSkill, $nilaiPsikologi, $nilaiKeterampilanBahasa);
             $status = $this->tentukanKeputusan($skorKeputusan);
-            $createdAt = Carbon::now();
-            $updatedAt = Carbon::now();
+            $createdAt = $faker->dateTimeBetween('-3 months', 'now');
+            $updatedAt = $createdAt; // Setelah dibuat, updated_at sama dengan created_at
 
             $karyawanId = DB::table('karyawan')->insertGetId([
                 'nama' => $namaKaryawan,
